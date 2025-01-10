@@ -1,9 +1,64 @@
-from PIL import Image
+from PIL import Image, ImageTk
 import numpy as np
-import tkinter
+import tkinter as tk
+from tkinter import Label
+from tkinter import filedialog
 import matplotlib.pyplot as plt
 
-#Greyscale Converison
+# GUI
+root = tk.Tk()
+root.geometry("100x100")
+root.config(bg="white")
+
+#IMAGE UPLOADER FUNCTION:
+def imageUploader():
+    fileTypes = [("Image files","png","jpg","jpeg")] # Correct formatting? 
+    path = tk.filedialog.askopenfilename(filetypes=fileTypes)
+
+    if len(path):
+        img = Image.open(path)
+        img = img.resize((200,200))
+        pic = ImageTk.PhotoImage(img)
+
+        #re-sizing the app window in order to fit the picture
+        # and button?
+        app.geometry("560x300")
+        label.config(image=pic)
+        label.image = pic
+
+        # if no file is selected, then display an error message:
+    else:
+        print("No file is chosen. Please choose a file")
+
+
+# SETTING UP BACKGROUND IMAGE:
+if __name__ == "__main__":
+
+# Defining tkinter object
+    app = tk.Tk()
+    app.geometry("560x270")
+
+    # adding background image
+    img = ImageTk.PhotoImage(file='') # add an actual file here
+    imgLabel = Label(app, image=img)
+    imgLabel.place(x=0, y=0)
+
+
+# DEFINING UPLOAD BUTTON
+app.option_add("*Label*Background", "white")
+app.option_add("*Button*Background", "lightgreen")
+
+label = tk.Label(app)
+label.pack(pady=10)
+
+#defining the upload button
+uploadButton = tk.Button(app, text"Locate Image", command=imageUploader)
+uploadButton.pack(side=tk.BOTTOM, pady=20)
+
+app.mainloop()
+
+
+#GREYSCALE CONVERSION
 # Loading the image
 image = Image.open("example.jpg") # Replace with your image path
 image_array = np.array(image) # Convert to NumPy array
@@ -16,7 +71,7 @@ greyscale_array = np.mean(image_array, axis=2).astype(np.uint8) # Average along 
 #Display the original and greyscale images side by side
 plt.figure(figsize=(10,5))
 plt.subplot(1,2,1)
-plt.imshow(greyscale_array, cmap='gray') # Show greyscale imahe
+plt.imshow(greyscale_array, cmap='gray') # Show greyscale image
 plt.title("Greyscale Image")
 plt.axis("off")
 
@@ -105,3 +160,5 @@ plt.show()
 #Compute the edge magnitude using the formula
 
 # To retain only strong edges apply a threshold. This filters out weak edges (low gradiet magnitudes)
+
+root.mainloop()
