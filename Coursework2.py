@@ -6,8 +6,6 @@ from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from tkinter.ttk import Button
 import matplotlib.pyplot as plt
-import scipy as sp
-from scipy import signal
 
 # GUI setup
 root = tk.Tk()
@@ -35,7 +33,7 @@ def imageUploader():
             label.config(image=pic)
             label.image = pic
 
-         # if no file is selected, then display an error message:
+            # if no file is selected, then display an error message:
         else:
             print("No file is chosen. Please choose a file")
     except Exception as e:
@@ -100,27 +98,42 @@ plt.show()
 #Define the 3x3 blur kernel
 kernel = np.array([[1,1,1],
                    [1,1,1],
-                   [1,1,1]])/9 
+                   [1,1,1]])/9 # Normalise the kernel to sum to 1
 
 print(kernel.shape)
 
 def convolve(image, kernel):
-    image=np.array(image) 
+    #Get dimensions of the image and kernel
+    image=np.array(image) #check if this should be image
     print(image.shape)
-    print(kernel.shape)
     
-    #Perform convolution
-    blurred_image =  sp.signal.convolve2d(image, kernel, mode = "same", boundary="symm")
+    #Determine the padding size
+    pad_h = kernel_height // 2
+    pad_w = kernel_width // 2
 
-    return blurred_image
+    #Pad the image with zeros( To handle edges)
+    padded_image = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+
+    # Create an output array for the blurred image
+    output = np.zeros_like(image)
+
+    #Perform the convolution
+    for i in range(image_height):
+
+        for j in range(image_width):
+
+        #Extract the region of the image under the kernel
+        # Compute the weighted sum
+
+            return output
         
-blurred_image = convolve(image_array, kernel)
+    blurred_image = convolve(image_array, kernel)
 
-#Display blurred image
-plt.imshow(blurred_image, cmap='gray')
-plt.title("Blurred Image")
-plt.axis("off")
-plt.show()
+    #Display the blurred image
+    plt.imshow(blurred_image, cmap='gray')
+    plt.title("Blurred Image")
+    plt.axis("off")
+    plt.show()
 
 
 #Edge Detection:
@@ -159,3 +172,5 @@ plt.show()
 #Compute the edge magnitude using the formula
 
 # To retain only strong edges apply a threshold. This filters out weak edges (low gradiet magnitudes)
+
+

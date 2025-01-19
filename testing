@@ -1,0 +1,43 @@
+from PIL import Image, ImageTk, UnidentifiedImageError
+import numpy as np
+import tkinter as tk
+from tkinter import Label
+from tkinter.filedialog import askopenfilename
+from tkinter import messagebox
+from tkinter.ttk import Button
+import matplotlib.pyplot as plt
+
+root = tk.Tk()
+
+def imageUploader():
+    fileTypes = [("Image files","*.png;*.jpg;*.jpeg")] 
+    path = tk.filedialog.askopenfilename(filetypes=fileTypes)
+
+    if len(path):
+        img = Image.open(path)
+        img = img.resize((200,200))
+        pic = ImageTk.PhotoImage(img)
+
+        #re-sizing the app window in order to fit the picture
+        # and button?
+        root.geometry("560x300")
+        label = tk.Label(root)
+        label.config(image=pic)
+        label.image = pic
+
+        # if no file is selected, then display an error message:
+    else:
+        print("No file is chosen. Please choose a file")
+# DEFINING UPLOAD BUTTON
+root.option_add("*Label*Background", "white")
+root.option_add("*Button*Background", "lightgreen")
+
+label = tk.Label(root)
+label.pack(pady=10)
+
+#defining the upload button
+uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
+uploadButton.pack(side=tk.BOTTOM, pady=20)
+root.mainloop()
+imageUploader()
+
