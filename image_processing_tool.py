@@ -8,6 +8,7 @@ from tkinter.ttk import Button
 import matplotlib.pyplot as plt
 import scipy as sp
 from scipy import signal
+import cv2
 
 # GUI setup
 root = tk.Tk()
@@ -123,39 +124,68 @@ plt.axis("off")
 plt.show()
 
 
+import cv2
+import skimage.feature
+import sys
+
 #Edge Detection:
 
-#Define the Sobel filters
-sobel_x = np.array([[-1, 0, 1],
-                    [-2, 0, 2], 
-                    [-1, 0, 1]])
+image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
-sobel_y = np.array([[-1, 0, 1],
-                    [-2, 0, 2], 
-                    [-1, 0, 1]])
+if image is None:
+    print('Could not read image')
 
-# Write a function to apply a kernel(filter) to an image using convolution(from previous sections)
+def edgedectection(image_path):   
+
+    #Define the Sobel filters
+    sobel_x = np.array([[-1, 0, 1],
+                        [-2, 0, 2], 
+                        [-1, 0, 1]])
+
+    sobel_y = np.array([[-1, 0, 1],
+                        [-2, 0, 2], 
+                        [-1, 0, 1]])
+
+
 #Compute the horizontal and vertical gradients
-
-# Apply the sobel filters
-gradient_x = convolve(image_array, sobel_x)
-gradient_y = convolve(image_array, sobel_y)
-
-#Display the gradients
-plt.figure(figsize=(10,5))
-
-plt.subplot(1,2,1)
-plt.imshow(np.abs(gradient_x), cmap='gray')
-plt.title("Horizontal Gradient (Gx)")
-plt.axis("off")
-
-plt.subplot(1,2,2)
-plt.imshow(np.abs(gradient_y), cmap='gray')
-plt.title("Vertical Gradient (Gy)")
-plt.axis("off")
-
-plt.show()
+    gradient_x = cv2.filter2D(image,-1, sobel_x )
+    gradient_y = sp.signal.convolve2d(image,-1,sobel_y )
 
 #Compute the edge magnitude using the formula
+    magnitude = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
 
-# To retain only strong edges apply a threshold. This filters out weak edges (low gradiet magnitudes)
+#Display the gradients
+    plt.figure(figsize=(10,5))
+
+    plt.subplot(1,2,1)
+    plt.imshow(np.abs(gradient_x), cmap='gray')
+    plt.title("Horizontal Gradient (Gx)")
+    plt.axis("off")
+
+    plt.subplot(1,2,2)
+    plt.imshow(np.abs(gradient_y), cmap='gray')
+    plt.title("Vertical Gradient (Gy)")
+    plt.axis("off")
+
+    plt.subplot(1,3,3)
+    plt.imshow(magnitude, cmap='gray')
+    plt.title("Edge magnitude")
+    plt.axis("off")
+
+    # Strong edge control
+    sigma = float(sys.argv[2])
+    low_threshold = float(sys.argv[3])
+    high_threshold = float(sys.argv[4])
+
+    edges = skimage.feature.canny(
+        image = image,
+        sigma = sigma,
+        low_threshold= low_threshold, 
+        high_threshold = high_threshold,
+    )
+
+    plt.show()
+
+edgedetection(image)
+
+   

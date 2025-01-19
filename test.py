@@ -1,60 +1,65 @@
-from PIL import Image, ImageTk
-import numpy as np
-import tkinter as tk
-from tkinter import Label
-from tkinter import filedialog
-import matplotlib.pyplot as plt
+import cv2
+import skimage.feature
+import sys
 
-# GUI setup
-root = tk.Tk()
-root.geometry("100x100")
-root.config(bg="white")
+#Edge Detection:
 
-path = " "
+image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
+if image is None:
+    print('Could not read image')
 
-#IMAGE UPLOADER FUNCTION:
-def imageUploader():
-    fileTypes = [("Image files","*.png;*.jpg;*.jpeg")] 
-    path = tk.filedialog.askopenfilename(filetypes=fileTypes)
+def edgedectection(image_path):   
 
-    if len(path):
-        img = Image.open(path)
-        img = img.resize((200,200))
-        pic = ImageTk.PhotoImage(img)
+    #Define the Sobel filters
+    sobel_x = np.array([[-1, 0, 1],
+                        [-2, 0, 2], 
+                        [-1, 0, 1]])
 
-        #re-sizing the app window in order to fit the picture
-        # and button?
-        root.geometry("560x300")
-        label.config(image=pic)
-        label.image = pic
-
-        # if no file is selected, then display an error message:
-    else:
-        print("No file is chosen. Please choose a file")
+    sobel_y = np.array([[-1, 0, 1],
+                        [-2, 0, 2], 
+                        [-1, 0, 1]])
 
 
-# SETTING UP BACKGROUND IMAGE:
-#if __name__ == "__main__":
+#Compute the horizontal and vertical gradients
+    gradient_x = cv2.filter2D(image,-1, sobel_x )
+    gradient_y = sp.signal.convolve2d(image,-1,sobel_y )
 
-# Defining tkinter object
-   # root.geometry("560x270")
+#Compute the edge magnitude using the formula
+    magnitude = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
 
-    # adding background image
-    #img = ImageTk.PhotoImage(file=path ) 
-   # imgLabel = Label(root, image=img)
-    #imgLabel.place(x=0, y=0)
+#Display the gradients
+    plt.figure(figsize=(10,5))
 
+    plt.subplot(1,2,1)
+    plt.imshow(np.abs(gradient_x), cmap='gray')
+    plt.title("Horizontal Gradient (Gx)")
+    plt.axis("off")
 
-# DEFINING UPLOAD BUTTON
-root.option_add("*Label*Background", "white")
-root.option_add("*Button*Background", "lightgreen")
+    plt.subplot(1,2,2)
+    plt.imshow(np.abs(gradient_y), cmap='gray')
+    plt.title("Vertical Gradient (Gy)")
+    plt.axis("off")
 
-label = tk.Label(root)
-label.pack(pady=10)
+    plt.subplot(1,3,3)
+    plt.imshow(magnitude, cmap='gray')
+    plt.title("Edge magnitude")
+    plt.axis("off")
 
-#defining the upload button
-uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
-uploadButton.pack(side=tk.BOTTOM, pady=20)
+    # Strong edge control
+    sigma = float(sys.argv[2])
+    low_threshold = float(sys.argv[3])
+    high_threshold = float(sys.argv[4])
 
-root.mainloop()
+    edges = skimage.feature.canny(
+        image = image,
+        sigma = sigma,
+        low_threshold= low_threshold, 
+        high_threshold = high_threshold,
+    )
+
+    plt.show()
+
+edgedetection(image)
+
+   
