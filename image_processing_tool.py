@@ -1,4 +1,4 @@
-from PIL import Image, ImageTk, UnidentifiedImageError
+from PIL import Image, ImageTk, ImageFilter
 import numpy as np
 import tkinter as tk
 from tkinter import Label
@@ -112,67 +112,24 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 #Display blurred image using Matplotlib
-plt.imshow(blurred_image, cmap='gray') # Show greyscale image
+plt.imshow(blurred_image, cmap='gray') 
 plt.title("Blurred Image")
 plt.axis("off")
 plt.show()
 
 #Edge Detection:
 
-if image is None:
-    print('Could not read image')
+# Load Image
+image = Image.open("path")
 
-def edgedectection(image_path):   
+#Convert image to greyscale
+image = image.convert("L")
 
-    #Define the Sobel filters
-    sobel_x = np.array([[-1, 0, 1],
-                        [-2, 0, 2], 
-                        [-1, 0, 1]])
+# Detect edges
+edge_detection = image.filter(ImageFilter.FIND_EDGES)
 
-    sobel_y = np.array([[-1, 0, 1],
-                        [-2, 0, 2], 
-                        [-1, 0, 1]])
-
-
-#Compute the horizontal and vertical gradients
-    gradient_x = cv2.filter2D(image,-1, sobel_x )
-    gradient_y = sp.signal.convolve2d(image,-1,sobel_y )
-
-#Compute the edge magnitude using the formula
-    magnitude = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
-
-#Display the gradients
-    plt.figure(figsize=(10,5))
-
-    plt.subplot(1,2,1)
-    plt.imshow(np.abs(gradient_x), cmap='gray')
-    plt.title("Horizontal Gradient (Gx)")
-    plt.axis("off")
-
-    plt.subplot(1,2,2)
-    plt.imshow(np.abs(gradient_y), cmap='gray')
-    plt.title("Vertical Gradient (Gy)")
-    plt.axis("off")
-
-    plt.subplot(1,3,3)
-    plt.imshow(magnitude, cmap='gray')
-    plt.title("Edge magnitude")
-    plt.axis("off")
-
-    # Strong edge control
-    sigma = float(sys.argv[2])
-    low_threshold = float(sys.argv[3])
-    high_threshold = float(sys.argv[4])
-
-    edges = skimage.feature.canny(
-        image = image,
-        sigma = sigma,
-        low_threshold= low_threshold, 
-        high_threshold = high_threshold,
-    )
-
-    plt.show()
-
-edgedetection(image)
-
-   
+# Display edge detected image
+plt.imshow(edge_detection, cmap='gray') 
+plt.title("Edge Detection")
+plt.axis("off")
+plt.show()
