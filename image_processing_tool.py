@@ -1,19 +1,68 @@
 from PIL import Image, ImageTk, ImageFilter
 import numpy as np
 import tkinter as tk
-from tkinter import Label
+from tkinter import Label, Toplevel
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 import cv2
 
 
-# GUI setup
+#GUI SETUP
 root = tk.Tk()
 root.geometry("700x700")
 root.config(bg="white")
 root.title("Image Processing Tool")
 
 path = " "
+
+#FORM DETAILS FOR IMAGE
+def enterDetails():
+    top = Toplevel(root)
+    top.geometry("500x500")
+    top.title("Photo Description")
+    l = Label(top,text = "Please describe your photo:")
+
+    l.pack()
+
+    # Labels and entry
+    name_label = tk.Label(top, text="Enter the name of the image:")
+    name_label.pack(pady=10)
+    name_entry = tk.Entry(top)
+    name_entry(pady=5)
+
+    photographer_label = tk.Label(top, text="Enter the name of the image:")
+    photographer_label.pack(pady=10)
+    photographer_entry = tk.Entry(top)
+    photographer_entry(pady=5)
+
+    description_label = tk.Label(top, text="Enter a description of the image:")
+    description_label.pack(pady=10)
+    description_entry = tk.Entry(top)
+    description_entry(pady=5)
+
+    date_label = tk.Label(top, text="Enter the date of the image:")
+    date_label.pack(pady=10)
+    date_entry = tk.Entry(top)
+    date_entry(pady=5)
+
+    submission_label = tk.Label(top, text="Enter the date of submission of the image:")
+    submission_label.pack(pady=10)
+    submission_entry = tk.Entry(top)
+    submission_entry(pady=5)
+
+def getDetails():
+    name = name_entry.get()
+    photographer = photographer_entry.get()  #is this right
+    description = description_entry.get()
+    date = date_entry.get()
+    submission = submission_entry.get()
+
+print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
+
+top.destroy()
+
+submitButton = tk.Button(root, text="Submit Details", command=lambda:getDetails())
+submitButton.pack(side=tk.BOTTOM, pady=20)
 
 #IMAGE UPLOADER FUNCTION:
 def imageUploader():
