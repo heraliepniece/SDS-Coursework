@@ -2,6 +2,7 @@ from PIL import Image, ImageTk, ImageFilter
 import numpy as np
 import tkinter as tk
 from tkinter import Label, Toplevel
+from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 import cv2
@@ -39,7 +40,7 @@ def enterDetails():
     description_label.pack(pady=10)
     description_entry = tk.Entry(top)
     description_entry(pady=5)
-
+    
     date_label = tk.Label(top, text="Enter the date of the image:")
     date_label.pack(pady=10)
     date_entry = tk.Entry(top)
@@ -56,6 +57,10 @@ def getDetails():
     description = description_entry.get()
     date = date_entry.get()
     submission = submission_entry.get()
+
+    if len(description_entry.get()) > 250:  # is this right?
+        messagebox.showerror('Error', 'Please limit your description to 250 characters.')
+        return
 
 print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
 
@@ -80,6 +85,8 @@ def imageUploader():
             root.geometry("560x300")
             label.config(image=pic)
             label.image = pic
+
+            getDetails()
 
          # if no file is selected, then display an error message:
         else:
