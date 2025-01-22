@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import scipy as sp
 from scipy import signal
 import cv2
+import sys
+import skimage.feature
 
 # GUI setup
 root = tk.Tk()
@@ -87,50 +89,35 @@ plt.axis("off")
 
 plt.show()
 
-#Image Blurring
-# Load the image and convert to greyscale
-image = Image.open(path).convert("L") # Convert to grayscale
-image_array = np.array(image) # Convert to NumPy array
+#IMAGE BLURRING
 
-# Display the original image
-plt. imshow(image_array, cmap= 'gray')
-plt.title("Original Image")
-plt.axis("off")
-plt.show()
+#Load image
+image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
-#Define the 3x3 blur kernel
-kernel = np.array([[1,1,1],
-                   [1,1,1],
-                   [1,1,1]])/9 
+if image is None:
+    print("Error: Can not read image.")
+    exit()
 
-print(kernel.shape)
+cv2.imshow('Original Image', image)
+cv2.waitKey(0)
 
-def convolve(image, kernel):
-    image=np.array(image) 
-    print(image.shape)
-    print(kernel.shape)
-    
-    #Perform convolution
-    blurred_image =  sp.signal.convolve2d(image, kernel, mode = "same", boundary="symm")
+#Apply Gaussian Blur
+blurred_image = cv2.GaussianBlur(image, (5,5),0)
 
-    return blurred_image
-        
-blurred_image = convolve(image_array, kernel)
+#Display the blurred image
+cv2.imshow('Gaussian Blurring', blurred_image)
+cv2.waitKey(0)
 
-#Display blurred image
-plt.imshow(blurred_image, cmap='gray')
+# Close all OpenCv Windows
+cv2.destroyAllWindows()
+
+#Display blurred image using Matplotlib
+plt.imshow(blurred_image, cmap='gray') # Show greyscale image
 plt.title("Blurred Image")
 plt.axis("off")
 plt.show()
 
-
-import cv2
-import skimage.feature
-import sys
-
 #Edge Detection:
-
-image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
 if image is None:
     print('Could not read image')
