@@ -14,11 +14,11 @@ root.geometry("700x700")
 root.config(bg="white")
 root.title("Image Processing Tool")
 
-path = " "
+path = ""
 
 #FORM DETAILS FOR IMAGE
 def enterDetails():
-    global top
+    global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry
     top = Toplevel(root)
     top.geometry("500x500")
     top.title("Photo Description")
@@ -32,7 +32,7 @@ def enterDetails():
     name_entry = tk.Entry(top)
     name_entry.pack(pady=5)
 
-    photographer_label = tk.Label(top, text="Enter the name of the image:")
+    photographer_label = tk.Label(top, text="Enter the name of the photographer:")
     photographer_label.pack(pady=10)
     photographer_entry = tk.Entry(top)
     photographer_entry.pack(pady=5)
@@ -52,25 +52,28 @@ def enterDetails():
     submission_entry = tk.Entry(top)
     submission_entry.pack(pady=5)
 
+    submitButton = tk.Button(root, text="Submit Details", command=getDetails)
+    submitButton.pack(side=tk.BOTTOM, pady=20)
+
+
+#top.destroy()
+
+
+
 def getDetails():
-    global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry
-    name = name_entry.get()
-    photographer = photographer_entry.get()  #is this right
-    description = description_entry.get()
-    date = date_entry.get()
-    submission = submission_entry.get()
+                global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry
+                name = name_entry.get()
+                photographer = photographer_entry.get()  
+                description = description_entry.get()
+                date = date_entry.get()
+                submission = submission_entry.get()
 
-    if len(description_entry.get()) > 250:  # is this right?
-        messagebox.showerror('Error', 'Please limit your description to 250 characters.')
-        return
+                if len(description_entry.get()) > 250:  
+                    messagebox.showerror('Error', 'Please limit your description to 250 characters.')
+                    return
 
-    print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
-
-top.destroy()
-
-submitButton = tk.Button(root, text="Submit Details", command=lambda:getDetails())
-submitButton.pack(side=tk.BOTTOM, pady=20)
-
+                print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
+          
 #IMAGE UPLOADER FUNCTION:
 def imageUploader():
     try:
@@ -83,19 +86,19 @@ def imageUploader():
             img = img.resize((200,200))
             pic = ImageTk.PhotoImage(img)
 
-            #re-sizing the app window in order to fit the picture
+            # re-sizing the app window in order to fit the picture
             root.geometry("560x300")
             label.config(image=pic)
             label.image = pic
-
-            getDetails()
-
-         # if no file is selected, then display an error message:
+            
+            enterDetails()
+            
+        # if no file is selected, then display an error message:
         else:
             print("No file is chosen. Please choose a file")
+    
     except Exception as e:
         print(f"An error occured: {e}")
-
 
 #GREYSCALE CONVERSION
 # Loading the image
@@ -166,7 +169,7 @@ def edgeDetection():
     plt.axis("off")
     plt.show()
 
-enterDetails()
+
 
 # DEFINING GUI COMPONENTS
 root.option_add("*Label*Background", "white")
