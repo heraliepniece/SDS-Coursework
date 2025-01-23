@@ -18,6 +18,7 @@ path = " "
 
 #FORM DETAILS FOR IMAGE
 def enterDetails():
+    global top
     top = Toplevel(root)
     top.geometry("500x500")
     top.title("Photo Description")
@@ -29,29 +30,30 @@ def enterDetails():
     name_label = tk.Label(top, text="Enter the name of the image:")
     name_label.pack(pady=10)
     name_entry = tk.Entry(top)
-    name_entry(pady=5)
+    name_entry.pack(pady=5)
 
     photographer_label = tk.Label(top, text="Enter the name of the image:")
     photographer_label.pack(pady=10)
     photographer_entry = tk.Entry(top)
-    photographer_entry(pady=5)
+    photographer_entry.pack(pady=5)
 
     description_label = tk.Label(top, text="Enter a description of the image:")
     description_label.pack(pady=10)
     description_entry = tk.Entry(top)
-    description_entry(pady=5)
+    description_entry.pack(pady=5)
     
     date_label = tk.Label(top, text="Enter the date of the image:")
     date_label.pack(pady=10)
     date_entry = tk.Entry(top)
-    date_entry(pady=5)
+    date_entry.pack(pady=5)
 
     submission_label = tk.Label(top, text="Enter the date of submission of the image:")
     submission_label.pack(pady=10)
     submission_entry = tk.Entry(top)
-    submission_entry(pady=5)
+    submission_entry.pack(pady=5)
 
 def getDetails():
+    global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry
     name = name_entry.get()
     photographer = photographer_entry.get()  #is this right
     description = description_entry.get()
@@ -62,7 +64,7 @@ def getDetails():
         messagebox.showerror('Error', 'Please limit your description to 250 characters.')
         return
 
-print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
+    print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
 
 top.destroy()
 
@@ -164,6 +166,7 @@ def edgeDetection():
     plt.axis("off")
     plt.show()
 
+enterDetails()
 
 # DEFINING GUI COMPONENTS
 root.option_add("*Label*Background", "white")
