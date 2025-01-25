@@ -16,6 +16,7 @@ logging.basicConfig(filename='app.log',format='%(asctime)s %(levelname)s %(messa
 
 # INITIALIZING SIGNATURES
 def signature_test():
+    global fileTypes
     SIGNATURES = {
     'png': bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
     'jpg': bytes([0xFF, 0xD8, 0xFF, 0xE0]),
@@ -24,15 +25,19 @@ def signature_test():
 
     for file_extension, sig in SIGNATURES.items():
 
-        if sig.get("file.extension", None) is None:
+        try:
+            if fileTypes.startswith(SIGNATURES[sig]):
+                matched = True
+                break
+            else:
+                logging.error("Unsupported image type.")
+                messagebox.showerror("Unsupported image type. Please select an image with the following file extensions: png,jpg,jpeg")
+
+        except:
             logging.error(f"Signature {sig} is missing a file extension.") # make all logging messages more descriptive
             messagebox.showerror(f"Signature {sig} is missing a file extension.")
 
-    if fileTypes.startswith(SIGNATURES['png','jpg','jpeg']):
-        pass
-    else:
-        logging.error("Unsupported image type.")
-        messagebox.showerror("Unsupported image type. Please select an image with the following file extensions: png,jpg,jpeg")
+    
 
 #GUI SETUP
 root = tk.Tk()
