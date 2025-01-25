@@ -7,6 +7,10 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 import cv2
 
+import logging
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(filename='app.log',format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 
 #GUI SETUP
 root = tk.Tk()
@@ -56,7 +60,7 @@ def enterDetails():
     submitButton.pack(side=tk.BOTTOM, pady=20)
 
 
-#top.destroy()
+top.destroy()   # check cause it wasnt working properly
 
 
 
@@ -69,6 +73,7 @@ def getDetails():
                 submission = submission_entry.get()
 
                 if len(description_entry.get()) > 250:  
+                    logging.error("Character length exceeded.")
                     messagebox.showerror('Error', 'Please limit your description to 250 characters.')
                     return
 
@@ -95,16 +100,21 @@ def imageUploader():
             
         # if no file is selected, then display an error message:
         else:
-            print("No file is chosen. Please choose a file")
-    
+            logging.error("No file was chosen.")
+            messagebox.showerror("File Selection Error","No file is chosen. Please choose a file")
+    except FileNotFoundError:
+       logging.error("File could not be located. ")
+       messagebox.showerror("File Not Found Error", "No file could be found. Please check the path.")
     except Exception as e:
-        print(f"An error occured: {e}")
+        logging.error(f"{e}")
+        messagebox.showerror("Error", f"An error occured: {e}")
 
 #GREYSCALE CONVERSION
 # Loading the image
 def greyscaleConversion():
     if not path:
-        print("No image was selected.")
+        logging.error("No image was chosen.")
+        messagebox.showerror("No image was selected.")
         exit()
 
     image = Image.open(path) 
@@ -126,7 +136,8 @@ def greyscaleConversion():
 #IMAGE BLURRING
 def imageBlur():
     if not path:
-        print("No image was selected.")
+        logging.error("No image was chosen.")
+        messagebox.showerror("No image was selected.")
         exit()
     #Load image
     image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
@@ -152,8 +163,10 @@ def imageBlur():
 #Edge Detection:
 def edgeDetection():
     if not path:
-        print("No image was selected.")
+        logging.error("No image was chosen.")
+        messagebox.showerror("No image was selected.")
         exit()
+        
     # Load Image
     image = Image.open(path)
 
