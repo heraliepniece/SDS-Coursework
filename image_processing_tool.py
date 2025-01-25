@@ -5,7 +5,7 @@ from tkinter import Label, Toplevel
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
-import cv2
+
 
 
 # INITIALIZING LOGGING
@@ -168,22 +168,12 @@ def imageBlur():
         messagebox.showerror("No image was selected.")
         exit()
     #Load image
-    image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    cv2.imshow('Original Image', image)
-    cv2.waitKey(0)
+    image = Image.open(path)
 
-    #Apply Gaussian Blur
-    blurred_image = cv2.GaussianBlur(image, (5,5),0)
-
-    #Display the blurred image
-    cv2.imshow('Gaussian Blurring', blurred_image)
-    cv2.waitKey(0)
-
-    # Close all OpenCv Windows
-    cv2.destroyAllWindows()
+    gaussian_blurred_image = image.filter(ImageFilter.GaussianBlur(radius=2))
 
     #Display blurred image using Matplotlib
-    plt.imshow(blurred_image, cmap='gray') 
+    plt.imshow(gaussian_blurred_image) 
     plt.title("Blurred Image")
     plt.axis("off")
     plt.show()
