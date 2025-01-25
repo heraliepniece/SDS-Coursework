@@ -7,10 +7,32 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 import cv2
 
+
+# INITIALIZING LOGGING
 import logging
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename='app.log',format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
+
+# INITIALIZING SIGNATURES
+def signature_test():
+    SIGNATURES = {
+    'png': bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
+    'jpg': bytes([0xFF, 0xD8, 0xFF, 0xE0]),
+    'jpeg':bytes([0xFF, 0xD8, 0xFF])
+    }
+
+    for file_extension, sig in SIGNATURES.items():
+
+        if sig.get("file.extension", None) is None:
+            logging.error(f"Signature {sig} is missing a file extension.") # make all logging messages more descriptive
+            messagebox.showerror(f"Signature {sig} is missing a file extension.")
+
+    if fileTypes.startswith(SIGNATURES['png','jpg','jpeg']):
+        pass
+    else:
+        logging.error("Unsupported image type.")
+        messagebox.showerror("Unsupported image type. Please select an image with the following file extensions: png,jpg,jpeg")
 
 #GUI SETUP
 root = tk.Tk()
@@ -83,6 +105,7 @@ def getDetails():
 def imageUploader():
     try:
         global path
+        global fileTypes
         fileTypes = [("Image files","*.png;*.jpg;*.jpeg")] 
         path = tk.filedialog.askopenfilename(filetypes=fileTypes)
 
@@ -166,7 +189,7 @@ def edgeDetection():
         logging.error("No image was chosen.")
         messagebox.showerror("No image was selected.")
         exit()
-        
+
     # Load Image
     image = Image.open(path)
 
