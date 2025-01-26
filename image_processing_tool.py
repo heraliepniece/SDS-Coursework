@@ -5,7 +5,8 @@ from tkinter import Label, Toplevel
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
-
+import requests
+#from oathlib.oauth2 import WebApplicationClient
 
 
 # INITIALIZING LOGGING
@@ -38,6 +39,41 @@ def signature_test():
             messagebox.showerror(f"Signature {sig} is missing a file extension.")
 
     
+# OAUTH SETUP
+
+# Authorize the user
+#client_id = 'xxxxx'
+#client = WebApplicationClient(client_id)
+
+#authorization_url = 'https://api.authorization-server.com/authorize'
+
+#url = client.prepare_request_uri(
+    #authorization_url,
+    #redirect_uri = 'https://your-web-app.com/redirect',
+    #scope = ['read:user'],
+    #state = 'D8VAo311AAl_49LAtM51HA'
+#)
+
+# Fetch access token
+#data = client.prepare_request_body(
+    #code = 'yyyyyyyyy',
+    #redirect_uri = 'https://your-web-app.com/redirect',
+    #client_id = 'xxxxxx',
+    #client_secret = 'zzzzzzzz',
+#)
+
+#token_url = 'https://api.authorization-server.com/token'
+#response = requests.post(token_url, data=data)
+
+#client.parse_request_body_response(response.text)
+
+# Obtain user info
+#header = {
+    #'Authorization': 'Bearer {}'.format(client.token['access_token'])
+#}
+
+#response = requests.get('https://api.resource-server.com/user'),
+
 
 #GUI SETUP
 root = tk.Tk()
@@ -46,6 +82,26 @@ root.config(bg="white")
 root.title("Image Processing Tool")
 
 path = ""
+
+#window for image processing functions:
+def imageprocessing():
+    window = Toplevel(root)
+    window.geometry("500x500")
+    window.title("Processing tools")
+    i = Label(window,text = "Please select which image processing tool you would like to use:")
+
+    i.pack()
+
+    greyscaleButton = tk.Button(root, text="Greyscale Conversion", command=greyscaleConversion)
+    greyscaleButton.pack(side="bottom", pady=10)
+
+    blurringButton = tk.Button(root, text="Image Blurring", command=imageBlur)
+    blurringButton.pack(side="bottom", pady=20)
+
+    edgeButton = tk.Button(root, text="Edge Detection", command=edgeDetection)
+    edgeButton.pack(side="bottom", pady=30)
+
+
 
 #FORM DETAILS FOR IMAGE
 def enterDetails():
@@ -84,11 +140,7 @@ def enterDetails():
     submission_entry.pack(pady=5)
 
     submitButton = tk.Button(root, text="Submit Details", command=getDetails)
-    submitButton.pack(side=tk.BOTTOM, pady=20)
-
-
-top.destroy()   # check cause it wasnt working properly
-
+    submitButton.pack(side="bottom", pady=20)
 
 
 def getDetails():
@@ -105,7 +157,10 @@ def getDetails():
                     return
 
                 print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
-          
+                top.destroy()
+
+
+
 #IMAGE UPLOADER FUNCTION:
 def imageUploader():
     try:
@@ -210,8 +265,8 @@ label = tk.Label(root)
 label.pack(pady=10)
 
 #defining the upload button
-uploadButton = tk.Button(root, text="Locate Image", command=lambda:imageUploader())
-uploadButton.pack(side=tk.BOTTOM, pady=20)
+uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
+uploadButton.pack(side="bottom", pady=20)
 
 root.mainloop()
 
