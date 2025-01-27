@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import os
+from threading import Thread
+import requests
 
 # INITIALIZING LOGGING
 import logging
@@ -49,25 +51,67 @@ def get_credentials():
         'client_secrets.json',
         scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email' ]
     )
-    
-    flow.run_local_server()
-    credentials = flow.credentials
 
-    user_info_service = build('oauth2', 'v2', credentials=credentials)
-    user_info = user_info_service.userinfo().get().execute()
+    host = 'localhost'
+    port = 8080
     
-    messagebox.showinfo("Success!", "Logged in successfully!")
-    return credentials
+    try:
+        flow.run_local_server()
+        credentials = flow.credentials
+    except Exception as e:
+        print(f"Error: {e}")
+
+        try:
+            thread = Thread(target= run_local_server)
+            thread.start()
+            thread.join(90)
+
+            if thread.is_alive():
+                        logging.warning("Login timed out.")
+            try:   
+                        requests.get(f'http://{host}:{port}/')
+            except Exception as e:
+                            logging.error("Error: {e}")
+                            messagebox.showerror("Authentication Error", "Login timed out. Please try again.")
+                            return None
+            
+            if credentials:
+                try:
+                    user_info_service = build('oauth2', 'v2', credentials=credentials)
+                    user_info = user_info_service.userinfo().get().execute()
+
+                    messagebox.showinfo("Success!", "Logged in successfully!")
+                    return credentials
+                
+                except Exception as e:
+                        logging.error("Error: {e}")
+                        messagebox.showerror("Authentication Error", "Login timed out. Please try again.")
+                        return None
+                
+        except Exception as e:
+            logging.error("Error: {e}")
+            messagebox.showerror("Authentication Error", "Login timed out. Please try again.")
+            return None
+
+
+    except Exception:
+        logging.error(f"Error during Google Authentication: {e}")
+        messagebox.showerror("Authentication Error", "Login failed. Please try again.")
+        return None
+    
+    
 
 def googleAuth():
     try:
         credentials = get_credentials()
-        uploadimage()
+        if credentials is not None:
+            root.withdraw()
+            uploadimage()
     except Exception as e:
         logging.error(f"Google authentication failed: {e}")
         messagebox.showerror("Authentication Error", "Google login failed.")
-    finally:
-        root.withdraw()
+        root.deiconify()
+        
        
 #GUI SETUP
 root = tk.Tk()
