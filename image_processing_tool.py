@@ -63,13 +63,10 @@ def get_credentials():
 
     user_info_service = build('oauth2', 'v2', credentials=credentials)
     user_info = user_info_service.userinfo().get().execute()
-    
+     # add a log?
+    return credentials
 def googleAuth():
     credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('gmail', 'v1', http=http)
-
-
 
        
 #GUI SETUP
