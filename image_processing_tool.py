@@ -248,17 +248,25 @@ def edgeDetection():
     plt.show()
 
 # DEFINING GUI COMPONENTS
-root.option_add("*Label*Background", "white")
-root.option_add("*Button*Background", "lightgreen")
+def main():
 
-label = tk.Label(root)
-label.pack(pady=10)
+    root.option_add("*Label*Background", "white")
+    root.option_add("*Button*Background", "lightgreen")
 
-#defining the upload button
-uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
-uploadButton.pack(side="bottom", pady=20)
+    label = tk.Label(root)
+    label.pack(pady=10)
+
+    #login button:
+    loginbutton = tk.Button(root, text= "Log in with google",command=googleAuth)
+    loginbutton(row=1, column=0)
 
 
+
+    #defining the upload button
+    uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
+    uploadButton.pack(side="bottom", pady=20)
+
+main()
 
 root.mainloop()
 
