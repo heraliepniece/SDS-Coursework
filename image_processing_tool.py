@@ -5,9 +5,9 @@ from tkinter import Label, Toplevel
 from tkinter import messagebox, filedialog
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
-from tkinter import *
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+import os
 
 # INITIALIZING LOGGING
 import logging
@@ -25,16 +25,15 @@ def signature_test():
     }
 
     for file_extension, sig in SIGNATURES.items():
-
-        try:
-            if fileTypes.startswith(SIGNATURES[sig]):   #check if this works
+        if any(file.endswith(f".{file_extension}") for file in fileTypes):
+            try:
                 matched = True
                 break
-            else:
+            except:
                 logging.error("Unsupported image type.")
                 messagebox.showerror("Unsupported image type. Please select an image with the following file extensions: png,jpg,jpeg")
 
-        except:
+        else:
             logging.error(f"Signature {sig} is missing a file extension.") # make all logging messages more descriptive
             messagebox.showerror(f"Signature {sig} is missing a file extension.")
 
@@ -56,15 +55,19 @@ def get_credentials():
 
     user_info_service = build('oauth2', 'v2', credentials=credentials)
     user_info = user_info_service.userinfo().get().execute()
-     
+    
+    messagebox.showinfo("Success!", "Logged in successfully!")
     return credentials
+
 def googleAuth():
-    credentials = get_credentials()
-
-    root.destroy()
-
-    uploadimage()
-
+    try:
+        credentials = get_credentials()
+        uploadimage()
+    except Exception as e:
+        logging.error(f"Google authentication failed: {e}")
+        messagebox.showerror("Authentication Error", "Google login failed.")
+    finally:
+        root.withdraw()
        
 #GUI SETUP
 root = tk.Tk()
@@ -76,6 +79,7 @@ path = ""
 
 # upload image window
 def uploadimage():
+    global window1
     window1 = Toplevel(root)
     window1.geometry("500x500")
     window1.title("Upload and Image")
@@ -94,15 +98,25 @@ def imageprocessing():
     window.title("Processing tools")
     i = Label(window,text = "Please select which image processing tool you would like to use:")
 
-    i.pack()
+    i.pack(pady=10)
 
-    greyscaleButton = tk.Button(root, text="Greyscale Conversion", command=greyscaleConversion)
+    if path:
+        original = Image_open(path)
+        orignal.thumbnail((300,300))
+
+        img1 = ImageTk.PhotoImage(original)
+
+        image_label = Label(window, image=img1)
+        image_label.img1 = img1
+        image_label.pack(pady=10)
+
+    greyscaleButton = tk.Button(window, text="Greyscale Conversion", command=greyscaleConversion)
     greyscaleButton.pack(side="bottom", pady=10)
 
-    blurringButton = tk.Button(root, text="Image Blurring", command=imageBlur)
+    blurringButton = tk.Button(window, text="Image Blurring", command=imageBlur)
     blurringButton.pack(side="bottom", pady=20)
 
-    edgeButton = tk.Button(root, text="Edge Detection", command=edgeDetection)
+    edgeButton = tk.Button(window, text="Edge Detection", command=edgeDetection)
     edgeButton.pack(side="bottom", pady=30)
 
 
@@ -147,21 +161,45 @@ def enterDetails():
 
 
 def getDetails():
-                global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry
+                global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry, window1
                 name = name_entry.get()
                 photographer = photographer_entry.get()  
                 description = description_entry.get()
                 date = date_entry.get()
                 submission = submission_entry.get()
 
+
                 if len(description_entry.get()) > 250:  
                     logging.error("Character length exceeded.")
                     messagebox.showerror('Error', 'Please limit your description to 250 characters.')
+                    return
+                
+                if not photographer_entry.get():
+                    logging.error("Null entry")
+                    messagebox.showerror('Error', 'Please fill in all fields.')
+                    return
+                
+                if not description_entry.get():
+                    logging.error("Null entry")
+                    messagebox.showerror('Error', 'Please fill in all fields.')
+                    return
+                
+                if not date_entry.get():
+                    logging.error("Null entry")
+                    messagebox.showerror('Error', 'Please fill in all fields.')
+                    return
+                
+                if not submission_entry.get():
+                    logging.error("Null entry")
+                    messagebox.showerror('Error', 'Please fill in all fields.')
                     return
 
                 print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
                 top.destroy()
 
+                window1.destroy()
+
+                imageprocessing()
 
 #IMAGE UPLOADER FUNCTION:
 def imageUploader():
@@ -171,7 +209,7 @@ def imageUploader():
         fileTypes = [("Image files","*.png;*.jpg;*.jpeg")]   
         path = tk.filedialog.askopenfilename(filetypes=fileTypes)
 
-        if len(path):
+        if len(path) > 0 and os.path.isfile(path):
             img = Image.open(path)
             img = img.resize((200,200))
             pic = ImageTk.PhotoImage(img)
@@ -202,8 +240,8 @@ def greyscaleConversion():
         messagebox.showerror("No image was selected.")
         exit()
 
-    image = Image.open(path) 
-    image_array = np.array(image) # Convert to NumPy array
+    loaded_image = Image.open(path) 
+    image_array = np.array(loaded_image) # Convert to NumPy array
 
     print("Image shape:", image_array.shape) 
 
@@ -225,9 +263,9 @@ def imageBlur():
         messagebox.showerror("No image was selected.")
         exit()
     #Load image
-    image = Image.open(path)
+    loaded_image = Image.open(path)
 
-    gaussian_blurred_image = image.filter(ImageFilter.GaussianBlur(radius=2))
+    gaussian_blurred_image = loaded_image.filter(ImageFilter.GaussianBlur(radius=2))
 
     #Display blurred image using Matplotlib
     plt.imshow(gaussian_blurred_image) 
@@ -243,13 +281,13 @@ def edgeDetection():
         exit()
 
     # Load Image
-    image = Image.open(path)
+    loaded_image = Image.open(path)
 
     #Convert image to greyscale
-    image = image.convert("L")
+    loaded_image = loaded_image.convert("L")
 
     # Detect edges
-    edge_detection = image.filter(ImageFilter.FIND_EDGES)
+    edge_detection = loaded_image.filter(ImageFilter.FIND_EDGES)
 
     # Display edge detected image
     plt.imshow(edge_detection, cmap='gray') 
@@ -259,6 +297,7 @@ def edgeDetection():
 
 # DEFINING GUI COMPONENTS
 def main():
+    global label
 
     root.option_add("*Label*Background", "white")
     root.option_add("*Button*Background", "lightgreen")
