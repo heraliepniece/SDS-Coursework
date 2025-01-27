@@ -2,9 +2,10 @@ from PIL import Image, ImageTk, ImageFilter
 import numpy as np
 import tkinter as tk
 from tkinter import Label, Toplevel
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
+
 import requests
 #from oathlib.oauth2 import WebApplicationClient
 
@@ -27,7 +28,7 @@ def signature_test():
     for file_extension, sig in SIGNATURES.items():
 
         try:
-            if fileTypes.startswith(SIGNATURES[sig]):
+            if fileTypes.startswith(SIGNATURES[sig]):   #check if this works
                 matched = True
                 break
             else:
@@ -102,7 +103,6 @@ def imageprocessing():
     edgeButton.pack(side="bottom", pady=30)
 
 
-
 #FORM DETAILS FOR IMAGE
 def enterDetails():
     global top, name_entry, photographer_entry, description_entry, date_entry, submission_entry
@@ -166,7 +166,7 @@ def imageUploader():
     try:
         global path
         global fileTypes
-        fileTypes = [("Image files","*.png;*.jpg;*.jpeg")] 
+        fileTypes = [("Image files","*.png;*.jpg;*.jpeg")]   
         path = tk.filedialog.askopenfilename(filetypes=fileTypes)
 
         if len(path):
@@ -254,8 +254,6 @@ def edgeDetection():
     plt.title("Edge Detection")
     plt.axis("off")
     plt.show()
-
-
 
 # DEFINING GUI COMPONENTS
 root.option_add("*Label*Background", "white")
