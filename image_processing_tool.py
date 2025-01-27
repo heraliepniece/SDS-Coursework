@@ -5,16 +5,9 @@ from tkinter import Label, Toplevel
 from tkinter import messagebox, filedialog
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
-import requests
-import httplib2
-import os
-import webbrowser 
 from tkinter import *
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapliclient.dicovery import build
+from googleapiclient.discovery import build
 
 # INITIALIZING LOGGING
 import logging
@@ -63,10 +56,14 @@ def get_credentials():
 
     user_info_service = build('oauth2', 'v2', credentials=credentials)
     user_info = user_info_service.userinfo().get().execute()
-     # add a log?
+     
     return credentials
 def googleAuth():
     credentials = get_credentials()
+
+    root.destroy()
+
+    uploadimage()
 
        
 #GUI SETUP
@@ -76,6 +73,19 @@ root.config(bg="white")
 root.title("Image Processing Tool")
 
 path = ""
+
+# upload image window
+def uploadimage():
+    window1 = Toplevel(root)
+    window1.geometry("500x500")
+    window1.title("Upload and Image")
+    j = Label(window1,text = "Please choose an image to upload.")
+
+    j.pack()
+
+    #defining the upload button
+    uploadButton = tk.Button(window1, text="Locate Image", command=imageUploader)
+    uploadButton.pack(side="bottom", pady=20)
 
 #window for image processing functions:
 def imageprocessing():
@@ -132,7 +142,7 @@ def enterDetails():
     submission_entry = tk.Entry(top)
     submission_entry.pack(pady=5)
 
-    submitButton = tk.Button(root, text="Submit Details", command=getDetails)
+    submitButton = tk.Button(top, text="Submit Details", command=getDetails)
     submitButton.pack(side="bottom", pady=20)
 
 
@@ -256,15 +266,14 @@ def main():
     label = tk.Label(root)
     label.pack(pady=10)
 
+    intro_label = tk.Label(root, text = "Welcome to my image processing tool. Please log in to continue", font =("Times New Roman", 15))
+    intro_label.pack(pady=40)
+
     #login button:
     loginbutton = tk.Button(root, text= "Log in with google",command=googleAuth)
-    loginbutton(row=1, column=0)
+    loginbutton.pack(pady=10)
 
 
-
-    #defining the upload button
-    uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
-    uploadButton.pack(side="bottom", pady=20)
 
 main()
 
