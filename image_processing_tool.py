@@ -5,10 +5,16 @@ from tkinter import Label, Toplevel
 from tkinter import messagebox, filedialog
 from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
-
 import requests
-#from oathlib.oauth2 import WebApplicationClient
-
+import httplib2
+import os
+import webbrowser 
+from tkinter import *
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapliclient.dicovery import build
 
 # INITIALIZING LOGGING
 import logging
@@ -42,40 +48,30 @@ def signature_test():
     
 # OAUTH SETUP
 
-# Authorize the user
-#client_id = 'xxxxx'
-#client = WebApplicationClient(client_id)
+SCOPES = 'openid email'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'Image Processing tool'
 
-#authorization_url = 'https://api.authorization-server.com/authorize'
+def get_credentials():
+    flow = InstalledAppFlow.from_client_secrets_file(
+        'client_secrets.json',
+        scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email' ]
+    )
+    
+    flow.run_local_server()
+    credentials = flow.credentials
 
-#url = client.prepare_request_uri(
-    #authorization_url,
-    #redirect_uri = 'https://your-web-app.com/redirect',
-    #scope = ['read:user'],
-    #state = 'D8VAo311AAl_49LAtM51HA'
-#)
-
-# Fetch access token
-#data = client.prepare_request_body(
-    #code = 'yyyyyyyyy',
-    #redirect_uri = 'https://your-web-app.com/redirect',
-    #client_id = 'xxxxxx',
-    #client_secret = 'zzzzzzzz',
-#)
-
-#token_url = 'https://api.authorization-server.com/token'
-#response = requests.post(token_url, data=data)
-
-#client.parse_request_body_response(response.text)
-
-# Obtain user info
-#header = {
-    #'Authorization': 'Bearer {}'.format(client.token['access_token'])
-#}
-
-#response = requests.get('https://api.resource-server.com/user'),
+    user_info_service = build('oauth2', 'v2', credentials=credentials)
+    user_info = user_info_service.userinfo().get().execute()
+    
+def googleAuth():
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('gmail', 'v1', http=http)
 
 
+
+       
 #GUI SETUP
 root = tk.Tk()
 root.geometry("700x700")
@@ -158,7 +154,6 @@ def getDetails():
 
                 print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
                 top.destroy()
-
 
 
 #IMAGE UPLOADER FUNCTION:
@@ -265,6 +260,8 @@ label.pack(pady=10)
 #defining the upload button
 uploadButton = tk.Button(root, text="Locate Image", command=imageUploader())
 uploadButton.pack(side="bottom", pady=20)
+
+
 
 root.mainloop()
 
