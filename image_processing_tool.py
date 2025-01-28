@@ -10,6 +10,7 @@ from googleapiclient.discovery import build
 import os
 from threading import Thread
 import requests
+from datetime import datetime
 
 # INITIALIZING LOGGING
 import logging
@@ -41,7 +42,6 @@ def signature_test():
 
     
 # OAUTH SETUP
-
 SCOPES = 'openid email'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Image Processing tool'
@@ -51,67 +51,25 @@ def get_credentials():
         'client_secrets.json',
         scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email' ]
     )
-
-    host = 'localhost'
-    port = 8080
     
-    try:
-        flow.run_local_server()
-        credentials = flow.credentials
-    except Exception as e:
-        print(f"Error: {e}")
+    flow.run_local_server()
+    credentials = flow.credentials
 
-        try:
-            thread = Thread(target= run_local_server)
-            thread.start()
-            thread.join(90)
-
-            if thread.is_alive():
-                        logging.warning("Login timed out.")
-            try:   
-                        requests.get(f'http://{host}:{port}/')
-            except Exception as e:
-                            logging.error("Error: {e}")
-                            messagebox.showerror("Authentication Error", "Login timed out. Please try again.")
-                            return None
-            
-            if credentials:
-                try:
-                    user_info_service = build('oauth2', 'v2', credentials=credentials)
-                    user_info = user_info_service.userinfo().get().execute()
-
-                    messagebox.showinfo("Success!", "Logged in successfully!")
-                    return credentials
-                
-                except Exception as e:
-                        logging.error("Error: {e}")
-                        messagebox.showerror("Authentication Error", "Login timed out. Please try again.")
-                        return None
-                
-        except Exception as e:
-            logging.error("Error: {e}")
-            messagebox.showerror("Authentication Error", "Login timed out. Please try again.")
-            return None
-
-
-    except Exception:
-        logging.error(f"Error during Google Authentication: {e}")
-        messagebox.showerror("Authentication Error", "Login failed. Please try again.")
-        return None
+    user_info_service = build('oauth2', 'v2', credentials=credentials)
+    user_info = user_info_service.userinfo().get().execute()
     
-    
+    messagebox.showinfo("Success!", "Logged in successfully!")
+    return credentials
 
 def googleAuth():
     try:
         credentials = get_credentials()
-        if credentials is not None:
-            root.withdraw()
-            uploadimage()
+        uploadimage()
     except Exception as e:
         logging.error(f"Google authentication failed: {e}")
         messagebox.showerror("Authentication Error", "Google login failed.")
-        root.deiconify()
-        
+    finally:
+        root.withdraw()
        
 #GUI SETUP
 root = tk.Tk()
@@ -237,6 +195,20 @@ def getDetails():
                     logging.error("Null entry")
                     messagebox.showerror('Error', 'Please fill in all fields.')
                     return
+                
+                try:
+                    datetime.strptime(date, "%d/%m/%y")
+                except ValueError:
+                    logging.error("Invalid date format for date field.")
+                    messagebox.showerror('Error', 'Please write the date of image taken in the following format: dd/mm/yy.')
+                    return
+
+                try:
+                    datetime.strptime(submission, "%d/%m/%y")
+                except ValueError:
+                    logging.error("Invalid date format for submission field.")
+                    messagebox.showerror('Error', 'Please write the date of submission in the following format: dd/mm/yy.')
+                    return
 
                 print(f"Name: {name}, Photographer: {photographer}, Description:{description}, Date of image: {date}, Date of Submission: {submission}")
                 top.destroy()
@@ -285,7 +257,7 @@ def greyscaleConversion():
         exit()
 
     loaded_image = Image.open(path) 
-    image_array = np.array(loaded_image) # Convert to NumPy array
+    image_array = np.array(loaded_image) #Convert to NumPy array
 
     print("Image shape:", image_array.shape) 
 
