@@ -27,19 +27,23 @@ def signature_test():
     'jpeg':bytes([0xFF, 0xD8, 0xFF])
     }
 
-    for file_extension, sig in SIGNATURES.items():
-        if any(file.endswith(f".{file_extension}") for file in fileTypes):
-            try:
+    try:
+        with open(path, 'rb') as file:
+            file_extension = file.read(8)
+
+        matched = False
+        for ext, sig in SIGNATURES.items():
+            if file_extension.startswith(sig):
                 matched = True
                 break
-            except:
-                logging.error("Unsupported image type.")
-                messagebox.showerror("Unsupported image type. Please select an image with the following file extensions: png,jpg,jpeg")
 
-        else:
-            logging.error(f"Signature {sig} is missing a file extension.") # make all logging messages more descriptive
-            messagebox.showerror(f"Signature {sig} is missing a file extension.")
-
+            if not matched:
+                logging.error(f"Unsupported file type.")
+                messagebox.showerror("Invalid File Type", "Invalid file type for image. Please select an image of one of the following formats: PNG, JPG, JPEG.")
+    except Exception as e:
+                logging.error(f"Error reading file: {e}")
+                messagebox.showerror("Error", f"Error: {e}")
+        
     
 # OAUTH SETUP
 SCOPES = 'openid email'
