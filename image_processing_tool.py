@@ -107,8 +107,8 @@ def imageprocessing():
     i.pack(pady=10)
 
     if path:
-        original = Image_open(path)
-        orignal.thumbnail((300,300))
+        original = Image.open(path)
+        original.thumbnail((300,300))
 
         img1 = ImageTk.PhotoImage(original)
 
